@@ -16,7 +16,9 @@ if (not os.path.exists('db.sqlite')):
   print("****** Bem-vindo(a), para começar, crie seu cadastro! ******")
   conn = sqlite3.connect('db.sqlite')
   cursor = conn.cursor()
-  functions.firstExecution(cursor, conn)
+  username = input('Informe o nome de usuário: ')
+  password = getpass.getpass('Infome a senha: ')
+  functions.firstExecution(cursor, conn, username, password)
   menu(cursor, conn)
 
 conn = sqlite3.connect('db.sqlite')

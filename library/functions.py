@@ -13,7 +13,7 @@ def insertUser(cursor, username, password):
   '''.format(username, passwordHash))
   return True
 
-def firstExecution(cursor, conn):
+def firstExecution(cursor, conn, username, password):
   cursor.execute('''
     CREATE TABLE IF NOT EXISTS user(
       username text,
@@ -27,8 +27,6 @@ def firstExecution(cursor, conn):
         password text
       );
   ''')
-  username = input('Informe o nome de usuário: ')
-  password = getpass.getpass('Infome a senha: ')
   if (insertUser(cursor, username, password)):
     conn.commit()
     return True
