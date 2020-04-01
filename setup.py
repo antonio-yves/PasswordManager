@@ -11,5 +11,5 @@ root.resizable(0,0)
 
 conn = sqlite3.connect('db.sqlite')
 cursor = conn.cursor()
-app = interface.LoginApplication(cursor, conn, master = root)
+app = interface.MenuApplication(cursor, conn, master = root)
 app.mainloop()

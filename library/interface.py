@@ -71,8 +71,115 @@ class MenuApplication(tk.Frame):
       self.createMenuWidgets()
 
     def createMenuWidgets(self):
-      servico = functions.recoveryPassword(self.cursor, 'Spotify')
-      self.infoLabel = tk.Label(self, text = 'Hello')
-      self.infoLabel.pack()
-      self.serviceName = tk.Label(self, text = servico[0])
-      self.serviceName.pack()
+      self.menuBar = tk.Menu(self)
+      self.menuFile = tk.Menu(self.menuBar, tearoff = 0)
+      self.menuFile.add_command(label = 'Adicionar Serviço', command = lambda: self.addService(AddService))
+      self.menuFile.add_command(label = 'Mostrar Serviços')
+      self.menuFile.add_command(label = 'Recuperar Serviço')
+      self.menuFile.add_separator()
+      self.menuFile.add_command(label = 'Sair')
+      self.menuBar.add_cascade(label = 'Arquivo', menu = self.menuFile)
+
+      self.menuHelp = tk.Menu(self.menuBar, tearoff = 0)
+      self.menuHelp.add_command(label = 'Documentação')
+      self.menuHelp.add_separator()
+      self.menuHelp.add_command(label = 'Sobre')
+      self.menuBar.add_cascade(label = 'Ajuda', menu = self.menuHelp)
+
+      self.master.config(menu = self.menuBar)
+
+      imagem = Image.open("assets/user_password.png")
+      imagem = imagem.resize((150, 150))
+      photo = ImageTk.PhotoImage(imagem)
+
+      self.ImageLabel = tk.Label(self, image = photo)
+      self.ImageLabel.image = photo
+      self.ImageLabel.grid(row = 0, column = 0, columnspan = 3, ipady = 100)
+
+    def addService(self, _class):
+      self.newWindow = tk.Toplevel(self.master)
+      _class(self.newWindow, self.cursor, self.conn)
+
+class AddService(tk.Frame):
+  def __init__(self, root, cursor, conn):
+    super().__init__(root)
+    self.root = root
+    self.root.geometry("400x200")
+    self.root.iconbitmap(r'assets/favicon.ico')
+    self.root.title("Gerenciador de Senhas - Adicionar Serviço")
+    self.root.resizable(0,0)
+    self.cursor = cursor
+    self.conn = conn
+    self.pack()
+    self.createWidgets()
+
+  def createWidgets(self):
+    self.serviceLabel = tk.Label(self, text='Nome do Serviço')
+    self.serviceInput = tk.Entry(self, width = 25)
+
+    self.usernameLabel = tk.Label(self, text='Username')
+    self.usernameInput = tk.Entry(self, width = 25)
+
+    self.passwordLabel = tk.Label(self, text='Password')
+    self.passwordInput = tk.Entry(self, width = 25, show='*')
+
+    self.serviceLabel.grid(row = 0, column = 0, ipady = 15)
+    self.serviceInput.grid(row = 0, column = 1)
+
+    self.usernameLabel.grid(row = 1, column = 0, ipadx = 10)
+    self.usernameInput.grid(row = 1, column = 1)
+
+    self.passwordLabel.grid(row = 2, column = 0, ipadx = 10, ipady = 15)
+    self.passwordInput.grid(row = 2, column = 1)
+
+    self.buttonCadastrar = tk.Button(self, text = "Cadastrar", width = 10, command = self.cadastrarServico)
+    self.buttonCadastrar.grid(row = 4, column = 0, columnspan = 2)
+
+  def cadastrarServico(self):
+    if ((self.serviceInput.get() == "") and (self.usernameInput.get() == "") and (self.passwordInput.get() == "")):
+      self.errorBox('Por favor, informe os dados necessários antes de continuar!')
+    elif (self.serviceInput.get() == ""):
+      self.errorBox('Por favor, informe o nome do serviço!')
+    elif (self.usernameInput.get() == ""):
+      self.errorBox('Por favor, informe o Username para continuar!')
+    elif (self.passwordInput.get() == ""):
+      self.errorBox('Por favor, informe a senha para continuar!')
+    else:
+      if (functions.addService(self.cursor, self.serviceInput.get(), self.usernameInput.get(), self.passwordInput.get(), self.conn) == True):
+        self.infoBox('Serviço cadastradado com sucesso.')
+        self.master.destroy()
+      else:
+        self.errorBox('Erro ao cadastrar serviço!')
+
+  def errorBox(self, message):
+    self.show_message = messagebox.showerror('Erro!', message)
+
+  def infoBox(self, message):
+    self.show_message = messagebox.showinfo('Sucesso', message)
+
+class ShowServices(tk.Frame):
+  def __init__(self, root, cursor, conn):
+    super().__init__(root)
+    self.root = root
+    self.root.geometry("400x200")
+    self.root.iconbitmap(r'assets/favicon.ico')
+    self.root.title("Gerenciador de Senhas - Mostrar Serviços")
+    self.root.resizable(0,0)
+    self.cursor = cursor
+    self.conn = conn
+    self.pack()
+    self.createWidgets()
+
+  def createWidgets(self):
+    '''
+    função ainda não implementada
+    '''
+    indexServices = functions.indexServices(self.cursor)
+    index = 1
+
+    self.id = tk.Label(self, text = 'ID')
+    self.serviceName = tk.Label(self, text = 'Nome do Serviço')
+
+    for service in indexServices:
+      self.serviceLabelID = tk.Label(self, text='{}'.format(index))
+      self.serviceLabelName = tk.Label(self, text = '{}'.format(service[0]))

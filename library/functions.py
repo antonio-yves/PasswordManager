@@ -42,10 +42,12 @@ def login(cursor, username, password):
     return True
   return "Senha incorreta, tente novamente"
 
-def addService(cursor, serviceName, username, password):
+def addService(cursor, serviceName, username, password, conn):
   cursor.execute('''
     INSERT INTO service (serviceName, username, password) VALUES ('{}', '{}', '{}');
   '''.format(serviceName, username, password))
+  conn.commit()
+  cursor.close()
   return True
 
 def indexServices(cursor):
@@ -82,7 +84,7 @@ def mainMenu(cursor, conn):
     serviceName = input("Informe o nome do serviço: ")
     username = input("Informe o username: ")
     password = input("Informe a senha: ")
-    if (addService(cursor, serviceName, username, password)):
+    if (addService(cursor, serviceName, username, password, conn)):
       return "Serviço adicionado com sucesso!\n"
     return "Algo deu errado... Por favor, tente cadastrar novamente!"
   elif op == "2":
